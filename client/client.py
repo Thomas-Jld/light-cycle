@@ -16,7 +16,7 @@ NUM_PLAYERS = 2
 INDEX = 0
 
 IP = '172.21.72.162'
-PORT = 5555
+PORT = 4444
 
 index = 1
 all_colors = [Color(255, 0, 0),Color(0, 255, 0),Color(255, 255, 0),Color(0, 255, 255)]
@@ -51,6 +51,7 @@ class bike:
         self.history = []
 
     def is_dead(self, all_players):
+        global SCENARIO
         if self.x < 0 or self.x*step >= width or self.y < 0 or self.y*step >= height:
             SCENARIO = 2
             self.show_all(all_players)
@@ -99,6 +100,7 @@ def setup():
 def draw():
     global INDEX
     global players
+    global SCENARIO
     if SCENARIO == 0:
         background(0)
         for p in players:
