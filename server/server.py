@@ -5,10 +5,10 @@ import threading
 import time 
 
 gameState=False
-
-joueursListe=[[] for k in range(2)]
-id = [[k,0] for k in range(4)]
-adresselist= [[] for k in range(2)]
+NB_PLAYERS = 4
+joueursListe=[[] for k in range(NB_PLAYERS)]
+id = [[k,0] for k in range(NB_PLAYERS)]
+adresselist= [[] for k in range(NB_PLAYERS)]
 
 def decode (b : bytes):
     s =b.decode("utf-8")
@@ -60,7 +60,7 @@ class connectionGame(threading.Thread):
 
         for k in range(len(id)):
                 
-                if k==1:
+                if k==NB_PLAYERS-1:
                     gameState=True
                     if id[k][1]==0:
                         id[k][1]=1
@@ -96,25 +96,25 @@ class connectionGame(threading.Thread):
                     time.sleep(1/100)
                     self.connection.send(encode(joueursListe))
 
-                # nbPlayerAlive = 0
-                # for k in joueursListe:
+                nbPlayerAlive = 0
+                for k in joueursListe:
 
-                #     if k[-1]==0:
-                #         nbPlayerAlive+=1
+                    if k[-1]==1:
+                        nbPlayerAlive+=1
 
-                # print("nombre de joueurs vivant = "+str(nbPlayerAlive))
+                #print("nombre de joueurs vivant = "+str(nbPlayerAlive))
 
-                # if nbPlayerAlive ==2 : 
-                #     print("Finitéééééééééé")
-                #     winner=5
-                #     gameState=False
-                #     for k in joueursListe:
-                #         if k[-1]==1:
-                #             winner=k[0]
-                #             break
+                if nbPlayerAlive ==1 : 
+                    winner=5
+                    gameState=False
+                    for k in joueursListe:
+                        if k[-1]==1:
+                            winner=k[0]
+                            break
 
-                #     print("THE WINNER IS : "+str(winner))  
-                #     break  
+                    print("THE WINNER IS : "+str(winner))
+
+                    break  
                 
                     
 
