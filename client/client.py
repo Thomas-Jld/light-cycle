@@ -12,7 +12,7 @@ step = 5
 width = 600
 height = 600
 
-NUM_PLAYERS = 2
+NUM_PLAYERS = 4
 INDEX = 0
 
 IP = '172.21.72.162'
@@ -27,6 +27,7 @@ starting_points = [[width/(4*step), height/(4*step)],
 starting_dirs = [1, 2, 3, 4]
 
 SCENARIO = 0
+CLEAR = 0
 
 def decode(by: bytes):
     s = by.decode("utf-8")
@@ -69,9 +70,11 @@ class bike:
         rect(self.x*step,self.y*step, step,step)
 
     def show_all(self, all_players):
+        print("reset")
         background(0)
         for p in all_players:
             if p.s == 1:
+                print(p)
                 for hist in p.history:
                     fill(p.c)
                     rect(hist[0]*step,hist[1]*step, step,step)
@@ -104,6 +107,8 @@ def draw():
     global INDEX
     global players
     global SCENARIO
+    global CLEAR
+    global step
     if SCENARIO == 0:
         background(0)
         for p in players:
@@ -116,6 +121,17 @@ def draw():
                 p.show()
 
         players[INDEX].is_dead(players)
+        if CLEAR == 1:
+            print("CLEAR")
+            background(0)
+            for p in players:
+                if p.s == 1:
+                    print(p)
+                    for hist in p.history:
+                        fill(p.c)
+                        rect(hist[0]*step,hist[1]*step, step,step)
+            CLEAR = 0
+
 
 def key_pressed(event):
     if key == 'UP' and players[INDEX].d != 4:
@@ -130,6 +146,7 @@ def key_pressed(event):
 
 def update_players(data: list):
     global players
+    global CLEAR
     if len(data) == NUM_PLAYERS and data[NUM_PLAYERS-1] != []:
         for i in range(NUM_PLAYERS):
             if i != INDEX:
@@ -142,7 +159,7 @@ def update_players(data: list):
                     players[i].s = 0
                     print(players)
                     print(data)
-                    players[i].show_all(players)
+                    CLEAR = 1
                 players[i].s = data[i][4]
 
 
