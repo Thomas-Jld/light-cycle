@@ -1,7 +1,7 @@
 # network-project
 ## Installation
-`make install` to install p5
-`make glfw` to install GLFW if necessary
+- `make install` to install p5
+- `make glfw` to install GLFW if necessary
 
 ## The Server
 
