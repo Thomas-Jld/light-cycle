@@ -109,13 +109,13 @@ def draw():
                 p.update()
 
 def key_pressed(event):
-    if key == 'UP' and players[0].d != 4:
+    if key == 'UP' and players[INDEX].d != 4:
         players[INDEX].d = 2
-    elif key == 'LEFT' and players[0].d != 1:
+    elif key == 'LEFT' and players[INDEX].d != 1:
         players[INDEX].d = 3
-    elif key == 'DOWN' and players[0].d != 2:
+    elif key == 'DOWN' and players[INDEX].d != 2:
         players[INDEX].d = 4  
-    elif key == 'RIGHT' and players[0].d != 3:
+    elif key == 'RIGHT' and players[INDEX].d != 3:
         players[INDEX].d = 1
 
 
