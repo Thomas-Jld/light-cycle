@@ -17,7 +17,7 @@ To launch the server simply use `make server`.
 ## The Client
 
 ### Description
-The client only displays the state of the game and send the direction the player wants to go toward. It clears dead players without impacting the game.
+The client only displays the state of the game and send the direction the player wants to go toward. It clears dead players without impacting the game. Move using the keypad arrows and exit by pressing `q`.
 
 ### Initialisation
 Set the host ip in `HOST` and the host port in `PORT`.
