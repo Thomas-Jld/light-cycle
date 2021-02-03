@@ -58,7 +58,7 @@ class bike:
 
         for player in all_players:
             for i in range(len(player.history)):
-                if player.history[i] == [self.x, self.y] and not (i > len(player.history-2) and player.id == self.id):
+                if player.history[i] == [self.x, self.y] and not (i > len(player.history) - 2 and player.id == self.id):
                     self.s = 0
                     self.show_all(all_players)
                     return True
