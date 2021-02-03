@@ -3,6 +3,10 @@ import threading
 import time 
 from p5 import Color
 
+HOST = '0.0.0.0'  
+PORT = 4444   
+SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 NUM_PLAYERS = 4
 WIDTH = 600 #Screen width
 HEIGHT = 600 #Screen height
@@ -14,10 +18,6 @@ STARTS_POS = [[  WIDTH/(4*STEP),   HEIGHT/(4*STEP)],
               [3*WIDTH/(4*STEP), 3*HEIGHT/(4*STEP)]]
 COLOR_NAMES = ["RED", "GREEN", "YELLOW", "CYAN"]
 STARTS_DIR = [1, 2, 4, 3]
-
-HOST = '0.0.0.0'  
-PORT = 4444   
-SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 history = [[] for i in range(NUM_PLAYERS)]
 players = []
