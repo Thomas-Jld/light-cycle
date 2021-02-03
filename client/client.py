@@ -71,7 +71,7 @@ class bike:
     def show_all(self, all_players):
         background(0)
         for p in all_players:
-            if not p.is_dead:
+            if p.s == 1:
                 for hist in p.history:
                     fill(p.c)
                     rect(hist[0]*step,hist[1]*step, step,step)
@@ -128,6 +128,8 @@ def update_players(data: list):
                 players[i].x = data[i][1]
                 players[i].y = data[i][2]
                 players[i].d = data[i][3]
+                if players[i].s != data[i][4]:
+                    players[i].show_all()
                 players[i].s = data[i][4]
 
 
@@ -138,6 +140,7 @@ class listener(threading.Thread):
         self.socket = socket
 
     def run(self):
+        background(0)
         global SCENARIO
         global players
         global INDEX
