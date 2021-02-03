@@ -51,14 +51,14 @@ class bike:
         self.history = []
 
     def is_dead(self, all_players):
-        if self.x < 0 or self.x >= width or self.y < 0 or self.y >= height:
+        if self.x < 0 or self.x*step >= width or self.y < 0 or self.y*step >= height:
             self.s = 0
             self.show_all(all_players)
             return True
 
         for player in all_players:
-            for hist in player.history:
-                if hist == [self.x, self.y]:
+            for i in range(len(player.history)):
+                if player.history[i] == [self.x, self.y] and not (i > len(player.history-2) and player.id == self.id):
                     self.s = 0
                     self.show_all(all_players)
                     return True
@@ -97,14 +97,16 @@ def setup():
     background(0)
 
 def draw():
+    global INDEX
     if SCENARIO == 0:
         background(0)
         for p in players:
-            if not p.is_dead(players):
-                p.show()
+            p.show()
+
     if SCENARIO == 1:
+        players[INDEX].is_dead(players)
         for p in players:
-            if not p.is_dead(players):
+            if p.s == 1:
                 p.show()
                 p.update()
 
