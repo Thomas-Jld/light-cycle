@@ -122,6 +122,7 @@ def key_pressed(event):
 
 
 def update_players(data: list):
+    global players
     if len(data) == NUM_PLAYERS and data[NUM_PLAYERS-1] != []:
         for i in range(NUM_PLAYERS):
             if i != INDEX:
@@ -130,7 +131,7 @@ def update_players(data: list):
                 players[i].d = data[i][3]
                 if players[i].s != data[i][-1]:
                     print("dead")
-                    players[i].show_all()
+                    players[i].show_all(players)
                 players[i].s = data[i][4]
 
 
