@@ -51,16 +51,15 @@ class bike:
         self.history = []
 
     def is_dead(self, all_players):
-        global SCENARIO
         if self.x < 0 or self.x*step >= width or self.y < 0 or self.y*step >= height:
-            SCENARIO = 2
+            self.s = 0
             self.show_all(all_players)
             return True
 
         for player in all_players:
             for i in range(len(player.history)):
                 if player.history[i] == [self.x, self.y] and not (i > len(player.history) - 2 and player.id == self.id):
-                    SCENARIO = 2
+                    self.s = 0
                     self.show_all(all_players)
                     return True
         return False
@@ -107,23 +106,11 @@ def draw():
             p.show()
 
     if SCENARIO == 1:
+        for p in players:
+            if p.s == 1:
+                p.update()
+                p.show()
         players[INDEX].is_dead(players)
-        for p in players:
-            if p.s == 1:
-                p.update()
-                p.show()
-
-    if SCENARIO == 2:
-        background(0)
-        for p in players:
-            if p.s == 1:
-                for hist in p.history:
-                    fill(p.c)
-                    rect(hist[0]*step,hist[1]*step, step,step)
-                p.update()
-                p.show()
-        SCENARIO = 1
-
 
 def key_pressed(event):
     if key == 'UP' and players[INDEX].d != 4:
@@ -138,7 +125,6 @@ def key_pressed(event):
 
 def update_players(data: list):
     global players
-    global SCENARIO
     if len(data) == NUM_PLAYERS and data[NUM_PLAYERS-1] != []:
         for i in range(NUM_PLAYERS):
             if i != INDEX:
@@ -148,8 +134,8 @@ def update_players(data: list):
                 if players[i].s != data[i][-1]:
                     print("dead")
                     players[i].history = []
-                    players[i].s = data[i][-1]
-                    SCENARIO = 2
+                    players[i].s = 0
+                    players[i].show_all(players)
                 players[i].s = data[i][4]
 
 
@@ -181,7 +167,6 @@ class listener(threading.Thread):
                     data = s.recv(1024)
                     if data != b"":
                         update_players(decode(data))
-                        time.sleep(1/(120*NUM_PLAYERS))
                         self.socket.send(encode([players[INDEX].id, players[INDEX].x, players[INDEX].y, players[INDEX].d, players[INDEX].s]))
                         
 
