@@ -75,6 +75,7 @@ class bike:
                 for hist in p.history:
                     fill(p.c)
                     rect(hist[0]*step,hist[1]*step, step,step)
+                
 
 
     def update(self):
@@ -89,7 +90,10 @@ class bike:
             self.y += 1
 
     def __str__(self):
-        return f"{self.id} {self.x} {self.y}"
+        return f"{self.id} x:{self.x} y:{self.y} state:{self.s} dir:{self.d}"
+
+    def __repr__(self):
+        return f"{self.id} x:{self.x} y:{self.y} state:{self.s} dir:{self.d}"
 
 def setup():
     size(width, height)
@@ -110,6 +114,7 @@ def draw():
             if p.s == 1:
                 p.update()
                 p.show()
+
         players[INDEX].is_dead(players)
 
 def key_pressed(event):
@@ -135,6 +140,8 @@ def update_players(data: list):
                     print("dead")
                     players[i].history = []
                     players[i].s = 0
+                    print(players)
+                    print(data)
                     players[i].show_all(players)
                 players[i].s = data[i][4]
 
