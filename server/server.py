@@ -93,6 +93,7 @@ class connectionGame(threading.Thread):
                     joueursListe[data[0]]=data
                     print(joueursListe)
                     print(encode(joueursListe))
+                    time.sleep(1/100)
                     self.connection.send(encode(joueursListe))
 
                 # nbPlayerAlive = 0
@@ -114,12 +115,12 @@ class connectionGame(threading.Thread):
 
                 #     print("THE WINNER IS : "+str(winner))  
                 #     break  
-            time.sleep(1/100)    
+                
                     
 
 
 HOST = '172.21.72.162'  # Standard loopback interface address (localhost)
-PORT = 5555   # Port to listen on (non-privileged ports are > 1023)
+PORT = 4444   # Port to listen on (non-privileged ports are > 1023)
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
