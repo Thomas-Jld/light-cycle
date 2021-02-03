@@ -161,7 +161,7 @@ class listener(threading.Thread):
                     data = s.recv(1024)
                     if data != b"":
                         update_players(decode(data))
-                        time.sleep(1/60)
+                        time.sleep(1/(120*NUM_PLAYERS))
                         self.socket.send(encode([players[INDEX].id, players[INDEX].x, players[INDEX].y, players[INDEX].d, players[INDEX].s]))
                         
 
