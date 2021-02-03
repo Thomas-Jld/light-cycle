@@ -1,4 +1,7 @@
-# network-project
+# Light Cycle
+
+Made by Adem RAHAL & Thomas JULDO 
+
 ## Installation
 - `make install` to install p5
 - `make glfw` to install GLFW if necessary
