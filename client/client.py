@@ -131,6 +131,7 @@ def update_players(data: list):
                 players[i].d = data[i][3]
                 if players[i].s != data[i][-1]:
                     print("dead")
+                    players[i].s = data[i][4]
                     players[i].show_all(players)
                 players[i].s = data[i][4]
 
