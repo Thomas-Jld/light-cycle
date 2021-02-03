@@ -140,7 +140,6 @@ class listener(threading.Thread):
         self.socket = socket
 
     def run(self):
-        background(0)
         global SCENARIO
         global players
         global INDEX
