@@ -1,7 +1,8 @@
 update:
 	git pull
-run:
-	python client/client.py
+
+client, server:
+	python $@/$@.py
 
 install:
 	pip3 install p5

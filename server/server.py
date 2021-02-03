@@ -1,133 +1,157 @@
-
-
 import socket
 import threading 
 import time 
+from p5 import Color
 
-gameState=False
-NB_PLAYERS = 4
-joueursListe=[[] for k in range(NB_PLAYERS)]
-id = [[k,0] for k in range(NB_PLAYERS)]
-adresselist= [[] for k in range(NB_PLAYERS)]
+NUM_PLAYERS = 4
+WIDTH = 600 #Screen width
+HEIGHT = 600 #Screen height
+FPS = 10
+STEP = 5
+STARTS_POS = [[  WIDTH/(4*STEP),   HEIGHT/(4*STEP)], 
+              [  WIDTH/(4*STEP), 3*HEIGHT/(4*STEP)], 
+              [3*WIDTH/(4*STEP),   HEIGHT/(4*STEP)], 
+              [3*WIDTH/(4*STEP), 3*HEIGHT/(4*STEP)]]
+COLOR_NAMES = ["RED", "GREEN", "YELLOW", "CYAN"]
+STARTS_DIR = [1, 2, 4, 3]
 
-def decode (b : bytes):
-    s =b.decode("utf-8")
-    parts = s.split(',')
-    rep= [int(float(part)) for part in parts]
-    return rep
+HOST = '0.0.0.0'  
+PORT = 4444   
+SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def encode (L: list):
-    rep=""
+history = [[] for i in range(NUM_PLAYERS)]
+players = []
+addresses = []
+started = False
+
+
+def decode_one(b : bytes) -> list:
+    return [int(float(part)) for part in b.decode("utf-8").split(',')]
+
+
+def encode_all(L: list) -> bytes:
+    rep = ""
     for k in range(len(L)):
-        rep+=";"
+        rep += ";"
         for i in range(len(L[k])):
-            rep+=str(L[k][i])
-            rep+=","
-
+            rep += str(L[k][i])
+            rep += ","
         rep = rep.strip(",")
     rep = rep.strip(";")
-
     return rep.encode("utf-8")
 
 
-class test(threading.Thread):
-    def __init__(self, connection,adresse):
+def encode_one(l: list) -> bytes:
+    s = ""
+    for i in range(len(l)):
+        s += str(l[i]) + ','
+    return s.strip(',').encode('utf-8')
 
+
+class update(threading.Thread):
+    def __init__(self, fr):
         threading.Thread.__init__(self)
-        self.connection= connection
-        self.adresse = adresse    
-
+        self.fr = fr
+    
     def run(self):
-        while(1):
-            x=self.connection.recv(1024)
-            if x != b'':
-                print(f"received : {x} from client {self.adresse}")
-                self.connection.sendall(b'4')
+        global players
+        global addresses
+        global SERVER
+        time.sleep(1)
+        while 1:
+            start_time = time.time()
+            count = 0
+            for i,player in enumerate(players):
+                if player[4] == 1:
+                    count += 1
+                    # Update history
+                    history[i].append([player[1], player[2]])
+                    # Update position
+                    if player[3] == 1:
+                        player[1] += 1
+                    elif player[3] == 2:
+                        player[2] -= 1
+                    elif player[3] == 3:
+                        player[1] -= 1
+                    elif player[3] == 4:
+                        player[2] += 1
 
+                    #Check if dead
+                    if player[1] < 0 or player[1]*STEP >= WIDTH or player[2] < 0 or player[2]*STEP >= HEIGHT:
+                        player[4] = 0
+
+                    for j, other in enumerate(players):
+                        if other[4] == 1:
+                            for pos in history[j]:
+                                if [player[1], player[2]] == pos:
+                                    player[4] = 0
+
+            if count <= 1:
+                for i,player in enumerate(players):
+                    if player[-1] == 1:
+                        print(f"AND THE WINNER IS {COLOR_NAMES[i]} !!!!!!!!")
+                SERVER.close()
+                break
+
+            for address in addresses:
+                address[0].sendto(encode_all(players), address[1])
+
+            end_time = time.time()
+            sleep_time = 1/self.fr - (end_time - start_time) if 1/self.fr > (end_time - start_time) else 0.01
+            time.sleep(sleep_time)
+            # time.sleep(1)
 
 
 class connectionGame(threading.Thread):
-    def __init__(self, connection,adresse):
+    def __init__(self, connection, address):
 
         threading.Thread.__init__(self)
         self.connection= connection
-        self.adresse = adresse    
+        self.address = address    
 
     def run(self):
-        global gameState
-        global adresselist
-        global joueursListe
+        global started
+        global addresses
+        global players
+        global STARTS_DIR
+        global STARTS_POS
+        global NUM_PLAYERS
+        
+        self.index = len(players)
+        player = [self.index, STARTS_POS[self.index][0], STARTS_POS[self.index][1], STARTS_DIR[self.index], 1]
+        players.append(player)
+        print(player)
 
-        for k in range(len(id)):
-                
-                if k==NB_PLAYERS-1:
-                    gameState=True
-                    if id[k][1]==0:
-                        id[k][1]=1
-                        time.sleep(1/100)
-                        self.connection.sendto(str(id[k][0]).encode("utf-8"),self.adresse)
-                        adresselist[id[k][0]]=[self.connection,self.adresse]
-                        for k in adresselist:
-                            k[0].sendto(b'start',k[1])
-                        
-                        break
-                        
-                elif id[k][1]==0:
-                    id[k][1]=1
-                    time.sleep(1/100)
-                    self.connection.sendto(str(id[k][0]).encode("utf-8"),self.adresse)
-                    adresselist[id[k][0]]=[self.connection,self.adresse]
-                        
-                    break
+        self.connection.sendto(encode_one(player), self.address)
 
+        addresses.append([self.connection, self.address])
+
+        if len(players) == NUM_PLAYERS:
+            time.sleep(1)
+            for address in addresses:
+                address[0].sendto(b'start', address[1])
+                started = True
+            upd = update(FPS)
+            upd.start()
+            print(f"Game started with {NUM_PLAYERS} players")
+        else:
+            print(f"Waiting for {NUM_PLAYERS-len(players)} players")
 
         while True:
-
-            while gameState== True:
-
-                data = self.connection.recv(1024)
-                if data != b'':
-
-                    data=decode(data)
-
-                    joueursListe[data[0]]=data
-                    print(joueursListe)
-                    print(encode(joueursListe))
-                    time.sleep(1/100)
-                    self.connection.send(encode(joueursListe))
-
-                nbPlayerAlive = 0
-                for k in joueursListe:
-
-                    if k[-1]==1:
-                        nbPlayerAlive+=1
-
-                #print("nombre de joueurs vivant = "+str(nbPlayerAlive))
-
-                if nbPlayerAlive ==1 : 
-                    winner=5
-                    gameState=False
-                    for k in joueursListe:
-                        if k[-1]==1:
-                            winner=k[0]
-                            break
-
-                    print("THE WINNER IS : "+str(winner))
-
-                    break  
+            if started:
+                new_dir = self.connection.recv(32)
+                if new_dir != b'':
+                    players[self.index][3] = int(float(new_dir.decode("utf-8")))
+            else:
+                time.sleep(1/10)
                 
-                    
 
 
-HOST = '172.21.72.162'  # Standard loopback interface address (localhost)
-PORT = 4444   # Port to listen on (non-privileged ports are > 1023)
+SERVER.bind((HOST, PORT))
 
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
 while 1:
-    s.listen()
-    conn, addr = s.accept()
+    SERVER.listen()
+    conn, addr = SERVER.accept()
 
-    new_client=connectionGame(conn,addr)
+    new_client = connectionGame(conn,addr)
     new_client.start()
